@@ -5,6 +5,8 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
+
     String fromDTO(MessageDTO messageDTO);
+
     MessageDTO toDTO(String message);
 }

@@ -1,38 +1,29 @@
 package repository;
 
+import config.TestRepositoriesConfig;
 import org.example.model.Teacher;
-import org.example.repositories.TeacherRepository;
-import org.junit.After;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.example.repositories.impl.TeacherRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.containers.MySQLContainer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ExtendWith(MockitoExtension.class)
-class TeacherRepositoryTests {
+import java.sql.SQLException;
+import java.util.List;
 
-    private TeacherRepository teacherRepository;
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TestRepositoriesConfig.class)
+public class TeacherRepositoryTests {
 
-    private static MySQLContainer<?> container = new MySQLContainer<>("mysql:latest")
-            .withInitScript("script.sql");
-
-    @BeforeAll
-    static void startContainer() {
-        container.start();
-    }
+    @Autowired
+    private TeacherRepositoryImpl teacherRepository;
 
     @Test
-    void testAdd() {
-        Teacher teacher = new Teacher("w")
-    }
-
-    @AfterAll
-    static void stopContainer() {
-        container.stop();
+    void testAdd() throws SQLException {
+        Teacher teacher = new Teacher("Василий Петров", 50000L, 43);
+        teacherRepository.save(teacher);
+        List<Teacher> teachers = teacherRepository.findAll();
+        teachers.forEach(System.out::println);
     }
 }

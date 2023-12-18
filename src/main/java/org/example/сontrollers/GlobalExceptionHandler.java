@@ -41,11 +41,11 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(new MessageDTO(message), HttpStatus.BAD_REQUEST);
     }
-/*
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<MessageDTO> internalServerError() {
 
         return new ResponseEntity<>(
                 new MessageDTO("Сбой в работе сервера"), HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
+    }
 }

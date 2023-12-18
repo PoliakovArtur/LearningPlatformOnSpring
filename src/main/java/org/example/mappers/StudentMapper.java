@@ -9,7 +9,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface StudentMapper {
+
     Student fromDTO(StudentDTO studentDTO);
+
     StudentDTO toDTO(Student student);
+
     List<StudentDTO> toDtoList(List<Student> students);
 }

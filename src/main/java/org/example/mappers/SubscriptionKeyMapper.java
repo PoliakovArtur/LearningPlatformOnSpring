@@ -6,5 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SubscriptionKeyMapper {
-    SubscriptionKey fromDTO(SubscriptionIncomingDTO incomingDTO);
+
+    SubscriptionKey fromDto(SubscriptionIncomingDTO incomingDTO);
+
 }

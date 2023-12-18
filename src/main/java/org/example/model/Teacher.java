@@ -1,14 +1,10 @@
 package org.example.model;
 
-import com.sun.istack.NotNull;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -68,5 +64,17 @@ public class Teacher {
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Teacher teacher)) return false;
+        return Objects.equals(getId(), teacher.getId()) && Objects.equals(getName(), teacher.getName()) && Objects.equals(getSalary(), teacher.getSalary()) && Objects.equals(getAge(), teacher.getAge());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getSalary(), getAge());
     }
 }

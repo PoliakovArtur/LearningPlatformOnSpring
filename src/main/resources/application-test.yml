@@ -1,0 +1,6 @@
+hibernate:
+  properties-short-path: hibernate/test.cfg.xml
+  properties-full-path: src/main/resources/hibernate/test.cfg.xml
+  properties-source-path: src/main/resources/hibernate/development.cfg.xml
+script:
+  path: script.sql

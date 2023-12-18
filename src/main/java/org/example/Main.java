@@ -9,7 +9,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class Main {
     public static void main(String[] args) throws LifecycleException {
         AnnotationConfigWebApplicationContext webContext = new AnnotationConfigWebApplicationContext();
-        webContext.scan("org.example");
+        webContext.scan("org.example.config");
 
         Runtime.getRuntime().addShutdownHook(new Thread(webContext::close));
 

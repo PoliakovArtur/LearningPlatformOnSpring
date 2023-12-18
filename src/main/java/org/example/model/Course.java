@@ -3,7 +3,6 @@ package org.example.model;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +12,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "courses")
@@ -112,5 +112,17 @@ public class Course {
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Course course)) return false;
+        return Objects.equals(getId(), course.getId()) && Objects.equals(getName(), course.getName()) && getType() == course.getType() && Objects.equals(getDescription(), course.getDescription()) && Objects.equals(getTeacher(), course.getTeacher()) && Objects.equals(getPrice(), course.getPrice()) && Objects.equals(getStudents(), course.getStudents());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getType(), getDescription(), getTeacher(), getPrice(), getStudents());
     }
 }

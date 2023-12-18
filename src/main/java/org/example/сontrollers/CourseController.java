@@ -1,8 +1,8 @@
 package org.example.сontrollers;
 
+import org.example.dto.MessageDTO;
 import org.example.dto.course_dto.CourseIncomingDTO;
 import org.example.dto.course_dto.CourseOutgoingDTO;
-import org.example.dto.MessageDTO;
 import org.example.facade.CourseFacade;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
-    private CourseFacade facade;
+    private final CourseFacade facade;
 
     public CourseController(CourseFacade facade) {
         this.facade = facade;

@@ -1,44 +1,18 @@
 package org.example.facade;
 
 import org.example.dto.StudentDTO;
-import org.example.dto.StudentDTO;
-import org.example.mappers.StudentMapper;
-import org.example.model.Student;
-import org.example.services.StudentService;
-import org.springframework.stereotype.Component;
+
 import java.util.List;
 
-@Component
-public class StudentFacade {
+public interface StudentFacade {
 
-    private StudentMapper mapper;
-    private StudentService service;
+    void save(StudentDTO dto);
 
-    public StudentFacade(StudentMapper mapper, StudentService service) {
-        this.mapper = mapper;
-        this.service = service;
-    }
+    void update(Long id, StudentDTO studentDTO);
 
-    public void save(StudentDTO dto) {
-        Student student = mapper.fromDTO(dto);
-        service.save(student);
-    }
+    StudentDTO findById(Long id);
 
-    public void update(Long id, StudentDTO studentDTO) {
-        Student student = mapper.fromDTO(studentDTO);
-        student.setId(id);
-        service.update(student);
-    }
+    List<StudentDTO> findAll();
 
-    public StudentDTO findById(Long id) {
-        return mapper.toDTO(service.findById(id));
-    }
-
-    public List<StudentDTO> findAll() {
-        return mapper.toDtoList(service.findAll());
-    }
-
-    public void deleteById(Long id) {
-        service.deleteById(id);
-    }
+    void deleteById(Long id);
 }

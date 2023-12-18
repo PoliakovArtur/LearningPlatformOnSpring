@@ -3,6 +3,7 @@ package org.example.model;
 
 import javax.persistence.Column;
 import java.io.Serializable;
+import java.util.Objects;
 
 public class SubscriptionKey implements Serializable {
 
@@ -34,6 +35,18 @@ public class SubscriptionKey implements Serializable {
 
     public void setCourseId(Long courseId) {
         this.courseId = courseId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SubscriptionKey that)) return false;
+        return Objects.equals(getStudentId(), that.getStudentId()) && Objects.equals(getCourseId(), that.getCourseId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getStudentId(), getCourseId());
     }
 
     @Override

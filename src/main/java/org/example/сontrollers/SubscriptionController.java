@@ -2,7 +2,7 @@ package org.example.сontrollers;
 
 import org.example.dto.MessageDTO;
 import org.example.dto.subscription_dto.SubscriptionIncomingDTO;
-import org.example.dto.subscription_dto.SubscriptionOutGoingDto;
+import org.example.dto.subscription_dto.SubscriptionOutGoingDTO;
 import org.example.facade.SubscriptionFacade;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +24,12 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public SubscriptionOutGoingDto findById(@RequestBody SubscriptionIncomingDTO incomingDto) {
+    public SubscriptionOutGoingDTO findById(@RequestBody SubscriptionIncomingDTO incomingDto) {
         return facade.findById(incomingDto);
     }
 
     @GetMapping("/all")
-    public List<SubscriptionOutGoingDto> findAll() {
+    public List<SubscriptionOutGoingDTO> findAll() {
         return facade.findAll();
     }
 

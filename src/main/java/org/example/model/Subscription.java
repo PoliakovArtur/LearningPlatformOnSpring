@@ -5,8 +5,8 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "subscriptions")
@@ -29,6 +29,12 @@ public class Subscription {
     public Subscription(SubscriptionKey id) {
         this.id = id;
     }
+
+    public Subscription(LocalDateTime subscriptionDate, SubscriptionKey id) {
+        this.subscriptionDate = subscriptionDate;
+        this.id = id;
+    }
+
     public SubscriptionKey getId() {
         return id;
     }
@@ -62,10 +68,14 @@ public class Subscription {
     }
 
     @Override
-    public String toString() {
-        return "{" +
-                "subscription_date=" + subscriptionDate +
-                ", id=" + id +
-                '}';
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Subscription that)) return false;
+        return Objects.equals(getSubscriptionDate(), that.getSubscriptionDate()) && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSubscriptionDate(), getId());
     }
 }

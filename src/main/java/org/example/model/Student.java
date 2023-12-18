@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "students")
@@ -22,9 +23,11 @@ public class Student {
     @Column(name = "registration_date")
     private LocalDateTime registrationDate;
 
-    public Student(Long id, String name, Integer age) {
-        this(name, age);
+    public Student(Long id, String name, Integer age, LocalDateTime registrationDate) {
         this.id = id;
+        this.name = name;
+        this.age = age;
+        this.registrationDate = registrationDate;
     }
 
     public Student(String name, Integer age) {
@@ -67,4 +70,15 @@ public class Student {
         this.registrationDate = registrationDate;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Student student)) return false;
+        return Objects.equals(getId(), student.getId()) && Objects.equals(getName(), student.getName()) && Objects.equals(getAge(), student.getAge()) && Objects.equals(getRegistrationDate(), student.getRegistrationDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getAge(), getRegistrationDate());
+    }
 }
