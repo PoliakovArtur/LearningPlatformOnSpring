@@ -2,7 +2,6 @@ package config;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.StatelessSession;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -25,9 +24,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +37,7 @@ public class TestRepositoriesConfig {
 
     private SessionFactory sessionFactory;
 
-    private List<Session> sessions = new ArrayList<>();
+    private final List<Session> sessions = new ArrayList<>();
 
     private MySQLContainer<?> mySQLContainer;
 
