@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static entity_factory.EntitiesForTests.EMPTY_COURSE;
-import static entity_factory.EntitiesForTests.FULL_COURSE;
+import static entity_factory.EntitiesForTests.COURSE;
 import static entity_factory.EntitiesForTests.NOT_FULL_COURSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,8 +39,8 @@ class CourseServiceImplTest {
 
     @Test
     void save_shouldSaveCourse() {
-        courseServiceImpl.save(FULL_COURSE);
-        verify(repository).save(FULL_COURSE);
+        courseServiceImpl.save(COURSE);
+        verify(repository).save(COURSE);
     }
 
     @Test
@@ -52,13 +52,13 @@ class CourseServiceImplTest {
     @Test
     void save_shouldNotFoundTeacher() {
         when(teacherService.findById(TEST_ID)).thenThrow(NotFoundException.class);
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.save(FULL_COURSE));
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.save(COURSE));
     }
 
 
     @Test
     void findAll_shouldFindCourses() {
-        List<Course> expected = List.of(FULL_COURSE);
+        List<Course> expected = List.of(COURSE);
         when(repository.findAll()).thenReturn(expected);
         List<Course> actual = courseServiceImpl.findAll();
         assertEquals(expected, actual);
@@ -72,9 +72,9 @@ class CourseServiceImplTest {
 
     @Test
     void findById_shouldFindCourse() {
-        when(repository.findById(TEST_ID)).thenReturn(Optional.of(FULL_COURSE));
+        when(repository.findById(TEST_ID)).thenReturn(Optional.of(COURSE));
         Course actual = courseServiceImpl.findById(TEST_ID);
-        assertEquals(FULL_COURSE, actual);
+        assertEquals(COURSE, actual);
     }
 
     @Test
@@ -98,9 +98,9 @@ class CourseServiceImplTest {
 
     @Test
     void updateById_shouldUpdateCourses() {
-        when(repository.update(FULL_COURSE)).thenReturn(true);
-        courseServiceImpl.update(FULL_COURSE);
-        verify(repository).update(FULL_COURSE);
+        when(repository.update(COURSE)).thenReturn(true);
+        courseServiceImpl.update(COURSE);
+        verify(repository).update(COURSE);
     }
 
     @Test
@@ -111,12 +111,12 @@ class CourseServiceImplTest {
     @Test
     void updateById_shouldNotFoundTeacher() {
         when(teacherService.findById(TEST_ID)).thenThrow(NotFoundException.class);
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.update(FULL_COURSE));
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.update(COURSE));
     }
 
     @Test
     void updateById_shouldNotFoundException() {
-        when(repository.update(FULL_COURSE)).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.update(FULL_COURSE));
+        when(repository.update(COURSE)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.update(COURSE));
     }
 }

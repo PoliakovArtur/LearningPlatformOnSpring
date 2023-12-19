@@ -1,5 +1,6 @@
 package org.example.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -124,5 +125,18 @@ public class Course {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getName(), getType(), getDescription(), getTeacher(), getPrice(), getStudents());
+    }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", description='" + description + '\'' +
+                ", teacher=" + teacher +
+                ", price=" + price +
+                ", students=" + students +
+                '}';
     }
 }

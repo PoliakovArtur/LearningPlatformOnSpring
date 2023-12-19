@@ -12,7 +12,7 @@ import java.util.List;
 
 import static entity_factory.EntitiesDtoForTests.STUDENT_DTO;
 import static entity_factory.EntitiesDtoForTests.STUDENT_DTO_WITHOUT_ID;
-import static entity_factory.EntitiesForTests.FULL_STUDENT;
+import static entity_factory.EntitiesForTests.STUDENT;
 import static entity_factory.EntitiesForTests.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -34,7 +34,7 @@ class StudentFacadeTest {
 
     @Test
     void findById_shouldCorrectMapStudent() {
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         StudentDTO actual = studentFacade.findById(ID);
         assertEquals(actual, STUDENT_DTO);
     }
@@ -42,7 +42,7 @@ class StudentFacadeTest {
     @Test
     void findAll_shouldCorrectMapStudents() {
         List<StudentDTO> expected = List.of(STUDENT_DTO);
-        when(studentService.findAll()).thenReturn(List.of(FULL_STUDENT));
+        when(studentService.findAll()).thenReturn(List.of(STUDENT));
         List<StudentDTO> actual = studentFacade.findAll();
         assertEquals(expected, actual);
     }
@@ -56,12 +56,12 @@ class StudentFacadeTest {
     @Test
     void save_shouldCorrectMapIncomingDto() {
         studentFacade.save(STUDENT_DTO);
-        verify(studentService).save(FULL_STUDENT);
+        verify(studentService).save(STUDENT);
     }
 
     @Test
     void update_shouldCorrectMapIncomingDto() {
         studentFacade.update(ID, STUDENT_DTO_WITHOUT_ID);
-        verify(studentService).update(FULL_STUDENT);
+        verify(studentService).update(STUDENT);
     }
 }

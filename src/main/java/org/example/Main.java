@@ -3,10 +3,12 @@ package org.example;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
+import org.hibernate.SessionFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 public class Main {
+
     public static void main(String[] args) throws LifecycleException {
         AnnotationConfigWebApplicationContext webContext = new AnnotationConfigWebApplicationContext();
         webContext.scan("org.example.config");
@@ -19,6 +21,5 @@ public class Main {
         DispatcherServlet dispatcherServlet = new DispatcherServlet(webContext);
         Tomcat.addServlet(context, "dispatcherServlet", dispatcherServlet).addMapping("/");
         tomcat.start();
-        System.out.println("http://localhost:8080/");
     }
 }

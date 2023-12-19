@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static entity_factory.EntitiesForTests.EMPTY_STUDENT;
-import static entity_factory.EntitiesForTests.FULL_STUDENT;
+import static entity_factory.EntitiesForTests.STUDENT;
 import static entity_factory.EntitiesForTests.NOT_FULL_STUDENT;
 import static entity_factory.EntitiesForTests.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,8 +36,8 @@ class StudentServiceImplTest {
 
     @Test
     void save_shouldSaveStudent() {
-        service.save(FULL_STUDENT);
-        verify(repository).save(FULL_STUDENT);
+        service.save(STUDENT);
+        verify(repository).save(STUDENT);
     }
 
     @Test
@@ -49,7 +49,7 @@ class StudentServiceImplTest {
 
     @Test
     void findAll_shouldFindStudents() {
-        List<Student> expected = List.of(FULL_STUDENT);
+        List<Student> expected = List.of(STUDENT);
         when(repository.findAll()).thenReturn(expected);
         List<Student> actual = service.findAll();
         assertEquals(expected, actual);
@@ -63,9 +63,9 @@ class StudentServiceImplTest {
 
     @Test
     void findById_shouldFindStudent() {
-        when(repository.findById(ID)).thenReturn(Optional.of(FULL_STUDENT));
+        when(repository.findById(ID)).thenReturn(Optional.of(STUDENT));
         Student actual = service.findById(ID);
-        assertEquals(FULL_STUDENT, actual);
+        assertEquals(STUDENT, actual);
     }
 
     @Test
@@ -89,9 +89,9 @@ class StudentServiceImplTest {
 
     @Test
     void updateById_shouldUpdateStudents() {
-        when(repository.update(FULL_STUDENT)).thenReturn(true);
-        service.update(FULL_STUDENT);
-        verify(repository).update(FULL_STUDENT);
+        when(repository.update(STUDENT)).thenReturn(true);
+        service.update(STUDENT);
+        verify(repository).update(STUDENT);
     }
 
     @Test
@@ -101,7 +101,7 @@ class StudentServiceImplTest {
 
     @Test
     void updateById_shouldNotFoundException() {
-        when(repository.update(FULL_STUDENT)).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> service.update(FULL_STUDENT));
+        when(repository.update(STUDENT)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> service.update(STUDENT));
     }
 }

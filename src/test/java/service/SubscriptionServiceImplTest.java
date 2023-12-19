@@ -14,10 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static entity_factory.EntitiesForTests.FULL_COURSE;
+import static entity_factory.EntitiesForTests.COURSE;
 import static entity_factory.EntitiesForTests.ID;
 import static entity_factory.EntitiesForTests.INVALID_SUBSCRIPTION_ID;
-import static entity_factory.EntitiesForTests.FULL_STUDENT;
+import static entity_factory.EntitiesForTests.STUDENT;
 import static entity_factory.EntitiesForTests.SUBSCRIPTION;
 import static entity_factory.EntitiesForTests.VALID_SUBSCRIPTION_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,8 +42,8 @@ class SubscriptionServiceImplTest {
 
     @Test
     void save_shouldSaveSubscription() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.findById(VALID_SUBSCRIPTION_ID)).thenReturn(Optional.empty());
         subscriptionService.save(VALID_SUBSCRIPTION_ID);
         verify(subscriptionRepository).save(VALID_SUBSCRIPTION_ID);
@@ -51,15 +51,15 @@ class SubscriptionServiceImplTest {
 
     @Test
     void save_tryToSaveExistsSubscription() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.findById(VALID_SUBSCRIPTION_ID)).thenReturn(Optional.of(SUBSCRIPTION));
         assertThrows(BadRequestException.class, () -> subscriptionService.save(VALID_SUBSCRIPTION_ID));
     }
 
     @Test
     void save_tryToSaveSubscriptionWithNonExistStudentId() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
+        when(courseService.findById(ID)).thenReturn(COURSE);
         when(studentService.findById(ID)).thenThrow(NotFoundException.class);
         assertThrows(NotFoundException.class, () -> subscriptionService.save(VALID_SUBSCRIPTION_ID));
     }
@@ -71,8 +71,8 @@ class SubscriptionServiceImplTest {
 
     @Test
     void update_shouldUpdateSubscription() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.update(VALID_SUBSCRIPTION_ID)).thenReturn(true);
         subscriptionService.update(VALID_SUBSCRIPTION_ID);
         verify(subscriptionRepository).update(VALID_SUBSCRIPTION_ID);
@@ -80,16 +80,16 @@ class SubscriptionServiceImplTest {
 
     @Test
     void update_shouldThrowNotFoundException() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.update(VALID_SUBSCRIPTION_ID)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> subscriptionService.update(VALID_SUBSCRIPTION_ID));
     }
 
     @Test
     void findById_shouldFindSubscription() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.findById(VALID_SUBSCRIPTION_ID)).thenReturn(Optional.of(SUBSCRIPTION));
         Subscription actual = subscriptionService.findById(VALID_SUBSCRIPTION_ID);
         assertEquals(SUBSCRIPTION, actual);
@@ -97,8 +97,8 @@ class SubscriptionServiceImplTest {
 
     @Test
     void findById_shouldThrowNotFoundException() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.findById(VALID_SUBSCRIPTION_ID)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> subscriptionService.findById(VALID_SUBSCRIPTION_ID));
     }
@@ -124,8 +124,8 @@ class SubscriptionServiceImplTest {
 
     @Test
     void deleteById_shouldDeleteSubscription() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.deleteById(VALID_SUBSCRIPTION_ID)).thenReturn(true);
         subscriptionService.deleteById(VALID_SUBSCRIPTION_ID);
         verify(subscriptionRepository).deleteById(VALID_SUBSCRIPTION_ID);
@@ -133,8 +133,8 @@ class SubscriptionServiceImplTest {
 
     @Test
     void deleteById_shouldThrowNotFoundException() {
-        when(courseService.findById(ID)).thenReturn(FULL_COURSE);
-        when(studentService.findById(ID)).thenReturn(FULL_STUDENT);
+        when(courseService.findById(ID)).thenReturn(COURSE);
+        when(studentService.findById(ID)).thenReturn(STUDENT);
         when(subscriptionRepository.deleteById(VALID_SUBSCRIPTION_ID)).thenReturn(false);
         assertThrows(NotFoundException.class, () -> subscriptionService.deleteById(VALID_SUBSCRIPTION_ID));
     }

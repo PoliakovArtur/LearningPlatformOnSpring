@@ -2,6 +2,7 @@ package config;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -11,31 +12,29 @@ import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.testcontainers.containers.MySQLContainer;
 import org.xml.sax.SAXException;
-import repository.XmlHandlerForHibernateConfig;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 @ComponentScan("org.example.repositories")
 public class TestRepositoriesConfig {
+
     private static final String PROPERTY_SOURCE = "application-test.yml";
 
     private StandardServiceRegistry standardServiceRegistry;
@@ -47,16 +46,18 @@ public class TestRepositoriesConfig {
     private MySQLContainer<?> mySQLContainer;
 
     @Value("${hibernate.properties-short-path}")
-    private String hibernateShortPath;
+    private String hibernateConfigShortPath;
 
     @Value("${hibernate.properties-full-path}")
-    private String hibernateFullPath;
+    private String hibernateConfigFullPath;
 
     @Value("${hibernate.properties-source-path}")
-    private String hibernateSourcePath;
+    private String hibernateConfigSourcePath;
 
     @Value("${script.path}")
-    private String scriptPath;
+    private String sqlScriptPath;
+
+    private File hibernateConfig;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer ymlPropertiesConfigurer() {
@@ -68,38 +69,34 @@ public class TestRepositoriesConfig {
     }
 
     @PostConstruct
-    public void configureHibernateAndRunContainer() {
-        mySQLContainer = new MySQLContainer<>("mysql:latest")
-                        .withInitScript(scriptPath);
+    public void configureRepos() {
+        mySQLContainer = new MySQLContainer<>("mysql:latest");
         mySQLContainer.start();
-        String url = mySQLContainer.getJdbcUrl();
-        String username = mySQLContainer.getUsername();
-        String password = mySQLContainer.getPassword();
-        createHibernateConfig(url, username, password);
-        try(BufferedReader reader = new BufferedReader(new FileReader(hibernateFullPath))) {
-            reader.lines().forEach(System.out::println);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        StandardServiceRegistryBuilder standardServiceRegistryBuilder = new StandardServiceRegistryBuilder();
-        this.standardServiceRegistry = standardServiceRegistryBuilder
-                .configure(hibernateShortPath)
-                .build();
-        MetadataSources metadataSources = new MetadataSources(standardServiceRegistry);
-        Metadata metadata = metadataSources.buildMetadata();
-        this.sessionFactory = metadata.buildSessionFactory();
+        createHibernateConfig(mySQLContainer.getJdbcUrl(), mySQLContainer.getUsername(), mySQLContainer.getPassword());
+        hibernateConfig = new File(hibernateConfigFullPath);
+        configureHibernate();
     }
 
     private void createHibernateConfig(String url, String userName, String password) {
         try {
             SAXParserFactory saxParserFactory = SAXParserFactory.newDefaultInstance();
             SAXParser saxParser = saxParserFactory.newSAXParser();
-            XmlHandlerForHibernateConfig handler = new XmlHandlerForHibernateConfig(url, userName, password, hibernateFullPath);
-            saxParser.parse(hibernateSourcePath, handler);
-            handler.close();
+            XmlBasedHibernateConfigCreator configCreator = new XmlBasedHibernateConfigCreator(url, userName, password, hibernateConfigFullPath);
+            saxParser.parse(hibernateConfigSourcePath, configCreator);
+            configCreator.close();
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void configureHibernate() {
+        StandardServiceRegistryBuilder standardServiceRegistryBuilder = new StandardServiceRegistryBuilder();
+        this.standardServiceRegistry = standardServiceRegistryBuilder
+                .configure(hibernateConfig)
+                .build();
+        MetadataSources metadataSources = new MetadataSources(standardServiceRegistry);
+        Metadata metadata = metadataSources.buildMetadata();
+        this.sessionFactory = metadata.buildSessionFactory();
     }
 
     @Bean
@@ -111,7 +108,7 @@ public class TestRepositoriesConfig {
     }
 
     @PreDestroy
-    public void closeResources() {
+    public void closeResources() throws IOException {
         mySQLContainer.stop();
         sessions.forEach(Session::close);
         sessionFactory.close();

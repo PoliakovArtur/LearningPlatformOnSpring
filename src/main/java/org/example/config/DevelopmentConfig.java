@@ -2,6 +2,7 @@ package org.example.config;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Configuration
 @ComponentScan("org.example")
+@EnableWebMvc
 public class DevelopmentConfig {
 
     private static final String PROPERTY_SOURCE = "application-development.yml";
@@ -69,4 +72,5 @@ public class DevelopmentConfig {
         sessionFactory.close();
         standardServiceRegistry.close();
     }
+
 }

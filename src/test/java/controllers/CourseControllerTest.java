@@ -5,8 +5,8 @@ import org.example.dto.course_dto.CourseIncomingDTO;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.NotFoundException;
 import org.example.facade.CourseFacade;
-import org.example.сontrollers.CourseController;
-import org.example.сontrollers.GlobalExceptionHandler;
+import org.example.controllers.CourseController;
+import org.example.controllers.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class CourseControllerTest {
+class CourseControllerTest {
 
     CourseController controller;
     GlobalExceptionHandler globalExceptionHandler;

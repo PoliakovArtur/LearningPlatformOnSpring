@@ -13,7 +13,7 @@ import java.util.List;
 import static entity_factory.EntitiesDtoForTests.COURSE_INCOMING_DTO;
 import static entity_factory.EntitiesDtoForTests.COURSE_INCOMING_DTO_WITHOUT_ID;
 import static entity_factory.EntitiesDtoForTests.COURSE_OUTGOING_DTO;
-import static entity_factory.EntitiesForTests.FULL_COURSE;
+import static entity_factory.EntitiesForTests.COURSE;
 import static entity_factory.EntitiesForTests.FULL_COURSE_WITH_ID_TEACHER;
 import static entity_factory.EntitiesForTests.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,14 +42,14 @@ class CourseFacadeTest {
 
     @Test
     void findById_shouldCorrectMapCourseOutgoingDto() {
-        when(service.findById(ID)).thenReturn(FULL_COURSE);
+        when(service.findById(ID)).thenReturn(COURSE);
         CourseOutgoingDTO actual = facade.findById(ID);
         assertEquals(COURSE_OUTGOING_DTO, actual);
     }
 
     @Test
     void findAll_shouldCorrectMapCourseOutgoingDto() {
-        when(service.findAll()).thenReturn(List.of(FULL_COURSE));
+        when(service.findAll()).thenReturn(List.of(COURSE));
         List<CourseOutgoingDTO> actual = facade.findAll();
         assertEquals(List.of(COURSE_OUTGOING_DTO), actual);
     }

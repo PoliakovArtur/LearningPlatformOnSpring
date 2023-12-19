@@ -1,4 +1,4 @@
-package org.example.сontrollers;
+package org.example.controllers;
 
 import org.example.dto.MessageDTO;
 import org.example.dto.subscription_dto.SubscriptionIncomingDTO;

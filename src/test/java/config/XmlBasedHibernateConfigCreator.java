@@ -1,7 +1,5 @@
-package repository;
+package config;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -9,7 +7,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
-public class XmlHandlerForHibernateConfig extends DefaultHandler {
+public class XmlBasedHibernateConfigCreator extends DefaultHandler {
 
     private final static String HEADER = """
             <!DOCTYPE hibernate-configuration PUBLIC
@@ -22,7 +20,7 @@ public class XmlHandlerForHibernateConfig extends DefaultHandler {
     private String password;
     private String attrValue;
 
-    public XmlHandlerForHibernateConfig(String url, String username, String password, String hibernateProperties) throws FileNotFoundException {
+    public XmlBasedHibernateConfigCreator(String url, String username, String password, String hibernateProperties) throws FileNotFoundException {
         this.url = url;
         this.username = username;
         this.password = password;
@@ -62,17 +60,5 @@ public class XmlHandlerForHibernateConfig extends DefaultHandler {
     public void close() {
         writer.flush();
         writer.close();
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

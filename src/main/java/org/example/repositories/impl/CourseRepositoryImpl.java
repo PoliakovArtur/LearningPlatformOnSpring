@@ -54,7 +54,7 @@ public class CourseRepositoryImpl implements CourseRepository {
             if(course.getTeacher() != null) notNullFields.put("teacher", course.getTeacher());
             if(course.getName() != null) notNullFields.put("name", course.getName());
             if(course.getPrice() != null) notNullFields.put("price", course.getPrice());
-            if(course.getType() != null) notNullFields.put("type", course.getType().name());
+            if(course.getType() != null) notNullFields.put("type", course.getType());
 
             criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
             for(Map.Entry<String, Object> entry : notNullFields.entrySet()) {

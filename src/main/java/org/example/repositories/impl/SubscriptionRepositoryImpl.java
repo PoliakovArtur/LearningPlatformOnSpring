@@ -39,7 +39,6 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
-            throw new InternalError();
         }
     }
 

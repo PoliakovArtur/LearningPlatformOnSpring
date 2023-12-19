@@ -11,6 +11,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
+import static entity_factory.EntitiesDtoForTests.INVALID_SUBSCRIPTION_INCOMING_DTO;
 import static entity_factory.EntitiesDtoForTests.SUBSCRIPTION_INCOMING_DTO;
 import static entity_factory.EntitiesDtoForTests.SUBSCRIPTION_OUT_GOING_DTO;
 import static entity_factory.EntitiesForTests.SUBSCRIPTION;

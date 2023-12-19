@@ -1,8 +1,8 @@
-package org.example.сontrollers;
+package org.example.controllers;
 
 import org.example.dto.MessageDTO;
-import org.example.dto.TeacherDTO;
-import org.example.facade.TeacherFacade;
+import org.example.dto.StudentDTO;
+import org.example.facade.StudentFacade;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,39 +15,40 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/teachers")
-public class TeacherController {
-    private TeacherFacade facade;
+@RequestMapping("/students")
+public class StudentController {
 
-    public TeacherController(TeacherFacade facade) {
+    private StudentFacade facade;
+
+    public StudentController(StudentFacade facade) {
         this.facade = facade;
     }
 
     @GetMapping()
-    public List<TeacherDTO> findAll() {
+    public List<StudentDTO> findAll() {
         return facade.findAll();
     }
 
     @GetMapping("/{id}")
-    public TeacherDTO findById(@PathVariable("id") long id) {
+    public StudentDTO findById(@PathVariable("id") long id) {
         return facade.findById(id);
     }
 
     @PostMapping
-    public MessageDTO save(@RequestBody TeacherDTO teacherDTO) {
-        facade.save(teacherDTO);
-        return new MessageDTO("Учитель сохранен");
+    public MessageDTO save(@RequestBody StudentDTO StudentDTO) {
+        facade.save(StudentDTO);
+        return new MessageDTO("Студент сохранен");
     }
 
     @PutMapping("/{id}")
-    public MessageDTO updateById(@PathVariable("id") long id, @RequestBody TeacherDTO teacherDTO) {
-        facade.update(id, teacherDTO);
-        return new MessageDTO(String.format("Данные об учителе c id {%d} обновлены", id));
+    public MessageDTO updateById(@PathVariable("id") long id, @RequestBody StudentDTO StudentDTO) {
+        facade.update(id, StudentDTO);
+        return new MessageDTO(String.format("Данные о студенте c id {%d} обновлены", id));
     }
 
     @DeleteMapping("/{id}")
     public MessageDTO deleteById(@PathVariable("id") long id) {
         facade.deleteById(id);
-        return new MessageDTO(String.format("Учитель с id {%d} успешно удален", id));
+        return new MessageDTO(String.format("Студент с id {%d} успешно удален", id));
     }
 }

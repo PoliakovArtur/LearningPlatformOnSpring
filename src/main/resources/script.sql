@@ -26,7 +26,6 @@ CREATE TABLE students
     age               int unsigned,
     registration_date date,
     PRIMARY KEY (id)
-
 );
 CREATE TABLE subscriptions
 (

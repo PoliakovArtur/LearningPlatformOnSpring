@@ -7,10 +7,8 @@ import org.example.dto.course_dto.CourseOutgoingDTO;
 import org.example.dto.subscription_dto.CourseForSubscriptionDTO;
 import org.example.dto.subscription_dto.SubscriptionIncomingDTO;
 import org.example.dto.subscription_dto.SubscriptionOutGoingDTO;
-import org.example.model.Course;
 import org.example.model.CourseType;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static entity_factory.EntitiesForTests.*;
@@ -34,6 +32,7 @@ public class EntitiesDtoForTests {
             CourseType.PROGRAMMING,  "Программирование на Java-Script", TEACHER_DTO, List.of(STUDENT_DTO),100000L);
 
     public final static SubscriptionIncomingDTO SUBSCRIPTION_INCOMING_DTO = new SubscriptionIncomingDTO(ID, ID);
+    public final static SubscriptionIncomingDTO INVALID_SUBSCRIPTION_INCOMING_DTO = new SubscriptionIncomingDTO(ID, null);
 
     public final static CourseForSubscriptionDTO COURSE_FOR_SUBSCRIPTION_DTO = new CourseForSubscriptionDTO(ID, "Веб-Разработчик",
             CourseType.PROGRAMMING,  100000L);
