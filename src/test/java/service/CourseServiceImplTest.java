@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static entity_factory.EntitiesForTests.EMPTY_COURSE;
 import static entity_factory.EntitiesForTests.COURSE;
+import static entity_factory.EntitiesForTests.ID;
 import static entity_factory.EntitiesForTests.NOT_FULL_COURSE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,20 +28,25 @@ class CourseServiceImplTest {
     private CourseRepository repository;
     private CourseServiceImpl courseServiceImpl;
     private TeacherService teacherService;
-    private final static Long TEST_ID = 1L;
-
+    private Course course = new Course();
 
     @BeforeEach
     void setUp() {
         repository = mock(CourseRepository.class);
         teacherService = mock(TeacherService.class);
         courseServiceImpl = new CourseServiceImpl(repository, teacherService);
+        course.setTeacher(COURSE.getTeacher());
+        course.setDescription(COURSE.getDescription());
+        course.setId(COURSE.getId());
+        course.setName(COURSE.getName());
+        course.setType(COURSE.getType());
+        course.setPrice(COURSE.getPrice());
     }
 
     @Test
     void save_shouldSaveCourse() {
-        courseServiceImpl.save(COURSE);
-        verify(repository).save(COURSE);
+        courseServiceImpl.save(course);
+        verify(repository).save(course);
     }
 
     @Test
@@ -51,10 +57,9 @@ class CourseServiceImplTest {
 
     @Test
     void save_shouldNotFoundTeacher() {
-        when(teacherService.findById(TEST_ID)).thenThrow(NotFoundException.class);
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.save(COURSE));
+        when(teacherService.findById(ID)).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.save(course));
     }
-
 
     @Test
     void findAll_shouldFindCourses() {
@@ -72,28 +77,28 @@ class CourseServiceImplTest {
 
     @Test
     void findById_shouldFindCourse() {
-        when(repository.findById(TEST_ID)).thenReturn(Optional.of(COURSE));
-        Course actual = courseServiceImpl.findById(TEST_ID);
+        when(repository.findById(ID)).thenReturn(Optional.of(COURSE));
+        Course actual = courseServiceImpl.findById(ID);
         assertEquals(COURSE, actual);
     }
 
     @Test
     void findById_shouldThrowNotFoundException() {
-        when(repository.findById(TEST_ID)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.findById(TEST_ID));
+        when(repository.findById(ID)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.findById(ID));
     }
 
     @Test
     void deleteById_shouldDeleteCourse() {
-        when(repository.deleteById(TEST_ID)).thenReturn(true);
-        courseServiceImpl.deleteById(TEST_ID);
-        verify(repository).deleteById(TEST_ID);
+        when(repository.deleteById(ID)).thenReturn(true);
+        courseServiceImpl.deleteById(ID);
+        verify(repository).deleteById(ID);
     }
 
     @Test
     void deleteById_shouldThrowNotFoundException() {
-        when(repository.deleteById(TEST_ID)).thenReturn(false);
-        assertThrows(NotFoundException.class, () -> courseServiceImpl.deleteById(TEST_ID));
+        when(repository.deleteById(ID)).thenReturn(false);
+        assertThrows(NotFoundException.class, () -> courseServiceImpl.deleteById(ID));
     }
 
     @Test
@@ -110,7 +115,7 @@ class CourseServiceImplTest {
 
     @Test
     void updateById_shouldNotFoundTeacher() {
-        when(teacherService.findById(TEST_ID)).thenThrow(NotFoundException.class);
+        when(teacherService.findById(ID)).thenThrow(NotFoundException.class);
         assertThrows(NotFoundException.class, () -> courseServiceImpl.update(COURSE));
     }
 
