@@ -3,6 +3,7 @@ package org.example.services.impl;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.NotFoundException;
 import org.example.model.Course;
+import org.example.model.Teacher;
 import org.example.repositories.CourseRepository;
 import org.example.services.CourseService;
 import org.example.services.TeacherService;
@@ -29,7 +30,8 @@ public class CourseServiceImpl implements CourseService {
                 || course.getTeacher() == null)
             throw new BadRequestException("Недостаточно данных для создания сущности");
         Long teacherId = course.getTeacher().getId();
-        teacherService.findById(teacherId);
+        Teacher teacher = teacherService.findById(teacherId);
+        course.setTeacher(teacher);
         courseRepository.save(course);
     }
 
