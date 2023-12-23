@@ -7,15 +7,10 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -33,55 +28,47 @@ public class StudentRepositoryImpl implements StudentRepository {
     public void save(Student student) {
         Transaction transaction = session.beginTransaction();
         try {
-            student.setRegistrationDate(LocalDateTime.now());
             session.save(student);
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
-            throw new InternalError();
         }
     }
 
     @Override
-    public boolean update(Student student) {
+    public boolean update(Student toUpdate) {
         Transaction transaction = session.beginTransaction();
-        int updateRows = 0;
+        boolean isUpdate = false;
         try {
-            CriteriaUpdate<Student> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Student.class);
-            Root<Student> root = criteriaUpdate.from(Student.class);
-            Long id = student.getId();
-            Map<String, Object> notNullFields = new HashMap<>(4, 1.0f);
-            if(student.getAge() != null) notNullFields.put("age", student.getAge());
-            if(student.getName() != null) notNullFields.put("name", student.getName());
+            Student student = session.get(Student.class, toUpdate.getId());
 
-            criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
-            for(Map.Entry<String, Object> entry : notNullFields.entrySet()) {
-                criteriaUpdate.set(entry.getKey(), entry.getValue());
-            }
-            updateRows = session.createQuery(criteriaUpdate).executeUpdate();
+            String name = toUpdate.getName();
+            Integer age = toUpdate.getAge();
+
+            if(age != null) student.setAge(age);
+            if(name != null) student.setName(name);
+
             transaction.commit();
+            isUpdate = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return updateRows > 0;
+        return isUpdate;
     }
 
     @Override
     public Optional<Student> findById(Long id) {
         Transaction transaction = session.beginTransaction();
-        Student Student = null;
+        Student student = null;
         try {
-            CriteriaQuery<Student> criteriaQuery = criteriaBuilder.createQuery(Student.class);
-            Root<Student> root = criteriaQuery.from(Student.class);
-            criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("id"), id));
-            Student = session.createQuery(criteriaQuery).getSingleResult();
+            student = session.get(Student.class, id);
             transaction.commit();
         } catch (Exception ex) {
             transaction.rollback();
         }
-        return Optional.ofNullable(Student);
+        return Optional.ofNullable(student);
     }
 
     @Override
@@ -104,17 +91,17 @@ public class StudentRepositoryImpl implements StudentRepository {
     @Override
     public boolean deleteById(Long id) {
         Transaction transaction = session.beginTransaction();
-        int deleteRows = 0;
+        boolean isDeleted = false;
         try {
-            CriteriaDelete<Student> criteriaDelete = criteriaBuilder.createCriteriaDelete(Student.class);
-            Root<Student> root = criteriaDelete.from(Student.class);
-            criteriaDelete.where(criteriaBuilder.equal(root.get("id"), id));
-            deleteRows = session.createQuery(criteriaDelete).executeUpdate();
+            Student student = session.get(Student.class, id);
+            if(student == null) return false;
+            session.delete(student);
             transaction.commit();
+            isDeleted = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return deleteRows > 0;
+        return isDeleted;
     }
 }

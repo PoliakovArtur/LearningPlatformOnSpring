@@ -14,7 +14,7 @@ import java.util.Optional;
 
 import static entity_factory.EntitiesForTests.EMPTY_TEACHER;
 import static entity_factory.EntitiesForTests.TEACHER;
-import static entity_factory.EntitiesForTests.NOT_FULL_TEACHER;
+import static entity_factory.EntitiesForTests.TEACHER_WITH_NAME;
 import static entity_factory.EntitiesForTests.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,7 +43,7 @@ class TeacherServiceImplTest {
     @Test
     void save_shouldThrowBadRequestException() {
         assertThrows(BadRequestException.class,() -> service.save(EMPTY_TEACHER));
-        assertThrows(BadRequestException.class,() -> service.save(NOT_FULL_TEACHER));
+        assertThrows(BadRequestException.class,() -> service.save(TEACHER_WITH_NAME));
     }
 
 

@@ -4,7 +4,7 @@ import org.example.dto.MessageDTO;
 import org.example.dto.StudentDTO;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.NotFoundException;
-import org.example.facade.StudentFacade;
+import org.example.facade.StudentServiceAdapterToMapper;
 import org.example.controllers.GlobalExceptionHandler;
 import org.example.controllers.StudentController;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static controllers.JsonStringConverter.asJsonString;
-import static entity_factory.EntitiesDtoForTests.NOT_FULL_STUDENT_DTO;
-import static entity_factory.EntitiesDtoForTests.STUDENT_DTO;
+import static entity_factory.EntitiesForTests.FIXED_DATE;
 import static entity_factory.EntitiesForTests.ID;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -39,11 +38,13 @@ class StudentControllerTest {
 
     MockMvc mockMvc;
 
-    private StudentFacade facade;
+    private StudentServiceAdapterToMapper facade;
+
+    private StudentDTO studentDTO = new StudentDTO(ID, "Петров Александр", 30, FIXED_DATE);
 
     @BeforeEach
     void setUp() {
-        facade = mock(StudentFacade.class);
+        facade = mock(StudentServiceAdapterToMapper.class);
         controller = new StudentController(facade);
         globalExceptionHandler = new GlobalExceptionHandler();
         mockMvc = MockMvcBuilders.standaloneSetup(controller, globalExceptionHandler).build();
@@ -51,12 +52,12 @@ class StudentControllerTest {
 
     @Test
     void getAll_shouldReturn200() throws Exception {
-        when(facade.findAll()).thenReturn(List.of(STUDENT_DTO));
+        when(facade.findAll()).thenReturn(List.of(studentDTO));
         mockMvc.perform(get("/students"))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(List.of(STUDENT_DTO)))
+                        content().json(asJsonString(List.of(studentDTO)))
                 );
     }
 
@@ -84,11 +85,11 @@ class StudentControllerTest {
 
     @Test
     void getById_shouldReturn200() throws Exception {
-        when(facade.findById(ID)).thenReturn(STUDENT_DTO);
+        when(facade.findById(ID)).thenReturn(studentDTO);
         mockMvc.perform(get("/students/1"))
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(STUDENT_DTO))
+                        content().json(asJsonString(studentDTO))
                 );
     }
 
@@ -129,21 +130,21 @@ class StudentControllerTest {
         String message = "Студент сохранен";
         mockMvc.perform(post("/students")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(STUDENT_DTO)))
+                        .content(asJsonString(studentDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).save(STUDENT_DTO);
+        verify(facade).save(studentDTO);
     }
 
     @Test
     void save_shouldReturn400() throws Exception {
         String message = "Недостаточно данных для создания сущности";
-        doThrow(new BadRequestException(message)).when(facade).save(NOT_FULL_STUDENT_DTO);
+        doThrow(new BadRequestException(message)).when(facade).save(studentDTO);
         mockMvc.perform(post("/students")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(NOT_FULL_STUDENT_DTO)))
+                        .content(asJsonString(studentDTO)))
                 .andExpectAll(
                         status().isBadRequest(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -155,21 +156,21 @@ class StudentControllerTest {
         String message = String.format("Данные о студенте c id {%d} обновлены", ID);
         mockMvc.perform(put("/students/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(NOT_FULL_STUDENT_DTO)))
+                        .content(asJsonString(studentDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).update(ID, NOT_FULL_STUDENT_DTO);
+        verify(facade).update(ID, studentDTO);
     }
 
     @Test
     void update_shouldReturn404() throws Exception {
         String message = String.format("Студент с id {%s} не найден", ID);
-        doThrow(new NotFoundException(message)).when(facade).update(ID, NOT_FULL_STUDENT_DTO);
+        doThrow(new NotFoundException(message)).when(facade).update(ID, studentDTO);
         mockMvc.perform(put("/students/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(NOT_FULL_STUDENT_DTO)))
+                        .content(asJsonString(studentDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))

@@ -1,12 +1,17 @@
 package controllers;
 
 import org.example.dto.MessageDTO;
+import org.example.dto.StudentDTO;
+import org.example.dto.TeacherDTO;
 import org.example.dto.course_dto.CourseIncomingDTO;
+import org.example.dto.course_dto.CourseOutgoingDTO;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.NotFoundException;
-import org.example.facade.CourseFacade;
+import org.example.facade.CourseServiceAdapterToMapper;
 import org.example.controllers.CourseController;
 import org.example.controllers.GlobalExceptionHandler;
+import org.example.model.Course;
+import org.example.model.CourseType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -16,8 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static controllers.JsonStringConverter.asJsonString;
-import static entity_factory.EntitiesDtoForTests.COURSE_INCOMING_DTO;
-import static entity_factory.EntitiesDtoForTests.COURSE_OUTGOING_DTO;
+import static entity_factory.EntitiesForTests.FIXED_DATE;
 import static entity_factory.EntitiesForTests.ID;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -38,11 +42,20 @@ class CourseControllerTest {
 
     MockMvc mockMvc;
 
-    private CourseFacade facade;
+    private CourseServiceAdapterToMapper facade;
+
+    private TeacherDTO teacherDTO = new TeacherDTO(ID, "Вареньев Алишер", 30000L, 30);
+    private StudentDTO studentDTO = new StudentDTO(ID, "Петров Александр", 30, FIXED_DATE);
+
+    private CourseIncomingDTO incomingDTO = new CourseIncomingDTO(ID, "Веб-Разработчик",
+            CourseType.PROGRAMMING,  "Программирование на Java-Script", ID,100000L);
+    private CourseOutgoingDTO outgoingDTO = new CourseOutgoingDTO(ID, "Веб-Разработчик",
+            CourseType.PROGRAMMING,  "Программирование на Java-Script", teacherDTO, List.of(studentDTO),100000L);
+
 
     @BeforeEach
     void setUp() {
-        facade = mock(CourseFacade.class);
+        facade = mock(CourseServiceAdapterToMapper.class);
         controller = new CourseController(facade);
         globalExceptionHandler = new GlobalExceptionHandler();
         mockMvc = MockMvcBuilders.standaloneSetup(controller, globalExceptionHandler).build();
@@ -50,12 +63,12 @@ class CourseControllerTest {
 
     @Test
     void getAll_shouldReturn200() throws Exception {
-        when(facade.findAll()).thenReturn(List.of(COURSE_OUTGOING_DTO));
+        when(facade.findAll()).thenReturn(List.of(outgoingDTO));
         mockMvc.perform(get("/courses"))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(List.of(COURSE_OUTGOING_DTO)))
+                        content().json(asJsonString(List.of(outgoingDTO)))
                 );
     }
 
@@ -75,7 +88,7 @@ class CourseControllerTest {
         String message = "Сбой в работе сервера";
         when(facade.findAll()).thenThrow(InternalError.class);
         mockMvc.perform(get("/courses")
-                        .content(asJsonString(List.of(COURSE_OUTGOING_DTO))))
+                        .content(asJsonString(List.of(outgoingDTO))))
                 .andExpectAll(
                         status().isInternalServerError(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -84,11 +97,11 @@ class CourseControllerTest {
 
     @Test
     void getById_shouldReturn200() throws Exception {
-        when(facade.findById(ID)).thenReturn(COURSE_OUTGOING_DTO);
+        when(facade.findById(ID)).thenReturn(outgoingDTO);
         mockMvc.perform(get("/courses/1"))
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(COURSE_OUTGOING_DTO))
+                        content().json(asJsonString(outgoingDTO))
                 );
     }
 
@@ -129,21 +142,21 @@ class CourseControllerTest {
         String message = "Курс сохранен";
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(COURSE_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).save(COURSE_INCOMING_DTO);
+        verify(facade).save(incomingDTO);
     }
 
     @Test
     void save_shouldReturn400() throws Exception {
         String message = "Недостаточно данных для создания сущности";
-        doThrow(new BadRequestException(message)).when(facade).save(COURSE_INCOMING_DTO);
+        doThrow(new BadRequestException(message)).when(facade).save(incomingDTO);
         mockMvc.perform(post("/courses")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(COURSE_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isBadRequest(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -155,21 +168,21 @@ class CourseControllerTest {
         String message = String.format("Данные о курсе c id {%d} обновлены", ID);
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(COURSE_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).update(ID, COURSE_INCOMING_DTO);
+        verify(facade).update(ID, incomingDTO);
     }
 
     @Test
     void update_shouldReturn404() throws Exception {
         String message = String.format("Курс     с id {%s} не найден", ID);
-        doThrow(new NotFoundException(message)).when(facade).update(ID, COURSE_INCOMING_DTO);
+        doThrow(new NotFoundException(message)).when(facade).update(ID, incomingDTO);
         mockMvc.perform(put("/courses/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(COURSE_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))

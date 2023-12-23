@@ -1,17 +1,14 @@
 package org.example.model;
 
-import javax.persistence.CascadeType;
+import org.hibernate.annotations.CreationTimestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -26,6 +23,7 @@ public class Student {
     private Integer age;
 
     @Column(name = "registration_date")
+    @CreationTimestamp
     private LocalDateTime registrationDate;
 
     public Student(Long id, String name, Integer age, LocalDateTime registrationDate) {
@@ -41,6 +39,12 @@ public class Student {
     }
 
     public Student() {}
+
+    public Student(Long id, String name, Integer age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
 
     public Long getId() {
         return id;

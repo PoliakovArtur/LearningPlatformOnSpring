@@ -7,14 +7,10 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -42,30 +38,27 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     }
 
     @Override
-    public boolean update(Teacher teacher) {
+    public boolean update(Teacher toUpdate) {
         Transaction transaction = session.beginTransaction();
-        int updateRows = 0;
+        boolean isUpdate = false;
         try {
-            CriteriaUpdate<Teacher> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Teacher.class);
-            Root<Teacher> root = criteriaUpdate.from(Teacher.class);
-            Long id = teacher.getId();
-            Map<String, Object> notNullFields = new HashMap<>(4, 1.0f);
+            Teacher teacher = session.get(Teacher.class, toUpdate.getId());
 
-            if(teacher.getAge() != null) notNullFields.put("age", teacher.getAge());
-            if(teacher.getName() != null) notNullFields.put("name", teacher.getName());
-            if(teacher.getSalary() != null) notNullFields.put("salary", teacher.getSalary());
+            Integer age = toUpdate.getAge();
+            String name = toUpdate.getName();
+            Long salary = toUpdate.getSalary();
 
-            criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
-            for(Map.Entry<String, Object> entry : notNullFields.entrySet()) {
-                criteriaUpdate.set(entry.getKey(), entry.getValue());
-            }
-            updateRows = session.createQuery(criteriaUpdate).executeUpdate();
+            if(age != null) teacher.setAge(age);
+            if(name != null) teacher.setName(name);
+            if(salary != null) teacher.setSalary(salary);
+
             transaction.commit();
+            isUpdate = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return updateRows > 0;
+        return isUpdate;
     }
 
     @Override
@@ -73,10 +66,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         Transaction transaction = session.beginTransaction();
         Teacher teacher = null;
         try {
-            CriteriaQuery<Teacher> criteriaQuery = criteriaBuilder.createQuery(Teacher.class);
-            Root<Teacher> root = criteriaQuery.from(Teacher.class);
-            criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("id"), id));
-            teacher = session.createQuery(criteriaQuery).getSingleResult();
+            teacher = session.get(Teacher.class, id);
             transaction.commit();
         } catch (Exception ex) {
             transaction.rollback();
@@ -104,17 +94,17 @@ public class TeacherRepositoryImpl implements TeacherRepository {
     @Override
     public boolean deleteById(Long id) {
         Transaction transaction = session.beginTransaction();
-        int deleteRows = 0;
+        boolean isDeleted = false;
         try {
-            CriteriaDelete<Teacher> criteriaDelete = criteriaBuilder.createCriteriaDelete(Teacher.class);
-            Root<Teacher> root = criteriaDelete.from(Teacher.class);
-            criteriaDelete.where(criteriaBuilder.equal(root.get("id"), id));
-            deleteRows = session.createQuery(criteriaDelete).executeUpdate();
+            Teacher teacher = session.get(Teacher.class, id);
+            if(teacher == null) return false;
+            session.delete(teacher);
             transaction.commit();
+            isDeleted = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return deleteRows > 0;
+        return isDeleted;
     }
 }

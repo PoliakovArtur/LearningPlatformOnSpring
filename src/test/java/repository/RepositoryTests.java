@@ -2,8 +2,10 @@ package repository;
 
 import config.TestRepositoriesConfig;
 import org.example.model.Course;
+import org.example.model.CourseType;
 import org.example.model.Student;
 import org.example.model.Subscription;
+import org.example.model.SubscriptionKey;
 import org.example.model.Teacher;
 import org.example.repositories.CourseRepository;
 import org.example.repositories.StudentRepository;
@@ -20,13 +22,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
-
-import static entity_factory.EntitiesForTests.COURSE;
-import static entity_factory.EntitiesForTests.ID;
-import static entity_factory.EntitiesForTests.STUDENT;
-import static entity_factory.EntitiesForTests.SUBSCRIPTION;
-import static entity_factory.EntitiesForTests.TEACHER;
-import static entity_factory.EntitiesForTests.VALID_SUBSCRIPTION_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,11 +44,18 @@ public class RepositoryTests {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-    private Student student;
+    private final static Long ID = 1L;
 
-    private Teacher teacher;
+    private Student student = new Student(ID, "Петров Александр", 30);
 
-    private Course course;
+    private Teacher teacher = new Teacher(ID, "Вареньев Алишер", 30000L, 30);
+
+    private Teacher teacherWithId = new Teacher(ID);
+
+    private Course course = new Course(ID, "Веб-Разработчик",
+            CourseType.PROGRAMMING,  "Программирование на Java-Script", teacherWithId,100000L);
+
+    private SubscriptionKey subscriptionKey = new SubscriptionKey(ID, ID);
 
     private Subscription subscription;
 
@@ -61,27 +63,18 @@ public class RepositoryTests {
     @Order(1)
     public void findByIdTest() {
         saveEntities();
-        teacher = teacherRepository.findById(ID).get();
-        student = studentRepository.findById(ID).get();
-        course = courseRepository.findById(ID).get();
-        subscription = subscriptionRepository.findById(VALID_SUBSCRIPTION_ID).get();
-
-        assertEquals(TEACHER, teacher);
-        assertEquals(COURSE, course);
-
-        assertEquals(STUDENT.getId(), student.getId());
-        assertEquals(STUDENT.getName(), student.getName());
-        assertEquals(STUDENT.getAge(), student.getAge());
-        assertNotNull(student.getRegistrationDate());
-
-        assertEquals(SUBSCRIPTION.getId(), subscription.getId());
+        assertEquals(teacher, teacherRepository.findById(ID).get());
+        assertEquals(course, courseRepository.findById(ID).get());
+        assertEquals(student, studentRepository.findById(ID).get());
+        subscription = subscriptionRepository.findById(subscriptionKey).get();
+        assertNotNull(subscription.getSubscriptionDate());
     }
 
     private void saveEntities() {
-        teacherRepository.save(TEACHER);
-        studentRepository.save(STUDENT);
-        courseRepository.save(COURSE);
-        subscriptionRepository.update(VALID_SUBSCRIPTION_ID);
+        teacherRepository.save(teacher);
+        studentRepository.save(student);
+        courseRepository.save(course);
+        subscriptionRepository.save(subscriptionKey);
     }
 
     @Test
@@ -103,6 +96,7 @@ public class RepositoryTests {
         assertTrue(studentRepository.update(student));
         assertTrue(teacherRepository.update(teacher));
         assertTrue(courseRepository.update(course));
+        assertTrue(subscriptionRepository.update(subscriptionKey));
 
         Teacher changedTeacher = teacherRepository.findById(ID).get();
         Student changedStudent = studentRepository.findById(ID).get();
@@ -116,7 +110,7 @@ public class RepositoryTests {
     @Test
     @Order(4)
     public void deleteByIdTest() {
-        assertTrue(subscriptionRepository.deleteById(VALID_SUBSCRIPTION_ID));
+        assertTrue(subscriptionRepository.deleteById(subscriptionKey));
         assertTrue(courseRepository.deleteById(ID));
         assertTrue(studentRepository.deleteById(ID));
         assertTrue(teacherRepository.deleteById(ID));
@@ -124,7 +118,6 @@ public class RepositoryTests {
         assertTrue(studentRepository.findById(ID).isEmpty());
         assertTrue(teacherRepository.findById(ID).isEmpty());
         assertTrue(courseRepository.findById(ID).isEmpty());
-        assertTrue(subscriptionRepository.findById(VALID_SUBSCRIPTION_ID).isEmpty());
+        assertTrue(subscriptionRepository.findById(subscriptionKey).isEmpty());
     }
-
 }

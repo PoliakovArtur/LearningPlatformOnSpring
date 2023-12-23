@@ -1,7 +1,7 @@
 package org.example.facade.impl;
 
 import org.example.dto.TeacherDTO;
-import org.example.facade.TeacherFacade;
+import org.example.facade.TeacherServiceAdapterToMapper;
 import org.example.mappers.TeacherMapper;
 import org.example.model.Teacher;
 import org.example.services.TeacherService;
@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class TeacherFacadeImpl implements TeacherFacade {
+public class TeacherServiceAdapterToMapperImpl implements TeacherServiceAdapterToMapper {
     private final TeacherService service;
     private final TeacherMapper mapper;
 
-    public TeacherFacadeImpl(TeacherService service, TeacherMapper mapper) {
+    public TeacherServiceAdapterToMapperImpl(TeacherService service, TeacherMapper mapper) {
         this.service = service;
         this.mapper = mapper;
     }

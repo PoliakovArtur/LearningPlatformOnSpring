@@ -5,7 +5,7 @@ import org.example.dto.subscription_dto.SubscriptionOutGoingDTO;
 
 import java.util.List;
 
-public interface SubscriptionFacade {
+public interface SubscriptionServiceAdapterToMapper {
 
     void save(SubscriptionIncomingDTO incomingDto);
 

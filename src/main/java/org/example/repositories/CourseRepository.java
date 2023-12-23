@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository {
-    void save(Course course);
+    boolean save(Course course);
 
     boolean update(Course course);
 

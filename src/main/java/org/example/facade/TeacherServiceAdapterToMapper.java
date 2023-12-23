@@ -3,7 +3,7 @@ package org.example.facade;
 import org.example.dto.TeacherDTO;
 import java.util.List;
 
-public interface TeacherFacade {
+public interface TeacherServiceAdapterToMapper {
     void save(TeacherDTO dto);
 
     void update(Long id, TeacherDTO teacherDTO);

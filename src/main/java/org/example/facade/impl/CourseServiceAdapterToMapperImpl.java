@@ -2,7 +2,7 @@ package org.example.facade.impl;
 
 import org.example.dto.course_dto.CourseIncomingDTO;
 import org.example.dto.course_dto.CourseOutgoingDTO;
-import org.example.facade.CourseFacade;
+import org.example.facade.CourseServiceAdapterToMapper;
 import org.example.mappers.CourseMapper;
 import org.example.model.Course;
 import org.example.model.Teacher;
@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class CourseFacadeImpl implements CourseFacade {
+public class CourseServiceAdapterToMapperImpl implements CourseServiceAdapterToMapper {
 
     private final CourseMapper mapper;
     private final CourseService service;
 
-    public CourseFacadeImpl(CourseMapper mapper, CourseService service) {
+    public CourseServiceAdapterToMapperImpl(CourseMapper mapper, CourseService service) {
         this.mapper = mapper;
         this.service = service;
     }

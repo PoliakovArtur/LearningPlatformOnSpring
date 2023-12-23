@@ -4,7 +4,7 @@ import org.example.dto.StudentDTO;
 
 import java.util.List;
 
-public interface StudentFacade {
+public interface StudentServiceAdapterToMapper {
 
     void save(StudentDTO dto);
 

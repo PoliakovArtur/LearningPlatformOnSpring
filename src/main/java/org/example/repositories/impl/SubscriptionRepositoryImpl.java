@@ -8,9 +8,7 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -33,7 +31,6 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         Transaction transaction = session.beginTransaction();
         try {
             Subscription subscription = new Subscription(id);
-            subscription.setSubscriptionDate(LocalDateTime.now());
             session.save(subscription);
             transaction.commit();
         } catch (Exception ex) {
@@ -45,20 +42,15 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     @Override
     public boolean update(SubscriptionKey id) {
         Transaction transaction = session.beginTransaction();
-        int updateRows = 0;
         try {
-            CriteriaUpdate<Subscription> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Subscription.class);
-            Root<Subscription> root = criteriaUpdate.from(Subscription.class);
-            criteriaUpdate
-                    .where(criteriaBuilder.equal(root.get("id"), id))
-                    .set("subscriptionDate", LocalDateTime.now());
-            updateRows = session.createQuery(criteriaUpdate).executeUpdate();
+            Subscription subscription = session.get(Subscription.class, id);
+            subscription.setSubscriptionDate(LocalDateTime.now());
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return updateRows > 0;
+        return true;
     }
 
     @Override
@@ -66,10 +58,7 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         Transaction transaction = session.beginTransaction();
         Subscription subscription = null;
         try {
-            CriteriaQuery<Subscription> criteriaQuery = criteriaBuilder.createQuery(Subscription.class);
-            Root<Subscription> root = criteriaQuery.from(Subscription.class);
-            criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("id"), id));
-            subscription = session.createQuery(criteriaQuery).getSingleResult();
+            subscription = session.get(Subscription.class, id);
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -98,17 +87,17 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
     @Override
     public boolean deleteById(SubscriptionKey id) {
         Transaction transaction = session.beginTransaction();
-        int deleteRows = 0;
+        boolean isDeleted = false;
         try {
-            CriteriaDelete<Subscription> criteriaDelete = criteriaBuilder.createCriteriaDelete(Subscription.class);
-            Root<Subscription> root = criteriaDelete.from(Subscription.class);
-            criteriaDelete.where(criteriaBuilder.equal(root.get("id"), id));
-            deleteRows = session.createQuery(criteriaDelete).executeUpdate();
+            Subscription subscription = session.get(Subscription.class, id);
+            if(subscription == null) return false;
+            session.delete(subscription);
             transaction.commit();
+            isDeleted = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return deleteRows > 0;
+        return isDeleted;
     }
 }

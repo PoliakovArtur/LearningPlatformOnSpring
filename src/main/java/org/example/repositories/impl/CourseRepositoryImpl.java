@@ -1,20 +1,19 @@
 package org.example.repositories.impl;
 
 import org.example.model.Course;
+import org.example.model.CourseType;
+import org.example.model.Teacher;
 import org.example.repositories.CourseRepository;
+import org.example.repositories.TeacherRepository;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -22,51 +21,59 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     private final Session session;
     private final CriteriaBuilder criteriaBuilder;
+    private final TeacherRepository teacherRepository;
 
-    public CourseRepositoryImpl(Session session) {
+    public CourseRepositoryImpl(Session session, TeacherRepository teacherRepository) {
+        this.teacherRepository = teacherRepository;
         this.session = session;
         this.criteriaBuilder = session.getCriteriaBuilder();
     }
 
     @Override
-    public void save(Course course) {
+    public boolean save(Course course) {
         Transaction transaction = session.beginTransaction();
+        boolean isSaved = false;
         try {
+            Optional<Teacher> teacher = teacherRepository.findById(course.getTeacher().getId());
+            course.setTeacher(teacher.orElseThrow());
             session.save(course);
             transaction.commit();
+            isSaved = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
-            throw new InternalError();
         }
+        return isSaved;
     }
 
     @Override
-    public boolean update(Course course) {
+    public boolean update(Course toUpdate) {
         Transaction transaction = session.beginTransaction();
-        int updateRows = 0;
+        boolean isUpdate = false;
         try {
-            CriteriaUpdate<Course> criteriaUpdate = criteriaBuilder.createCriteriaUpdate(Course.class);
-            Root<Course> root = criteriaUpdate.from(Course.class);
-            Long id = course.getId();
-            Map<String, Object> notNullFields = new HashMap<>(8, 1.0f);
-            if(course.getDescription() != null) notNullFields.put("description", course.getDescription());
-            if(course.getTeacher() != null) notNullFields.put("teacher", course.getTeacher());
-            if(course.getName() != null) notNullFields.put("name", course.getName());
-            if(course.getPrice() != null) notNullFields.put("price", course.getPrice());
-            if(course.getType() != null) notNullFields.put("type", course.getType());
+            Course course = session.get(Course.class, toUpdate.getId());
+            String name = toUpdate.getName();
+            Long price = toUpdate.getPrice();
+            String description = toUpdate.getDescription();
+            CourseType courseType = toUpdate.getType();
+            Teacher teacher = toUpdate.getTeacher();
 
-            criteriaUpdate.where(criteriaBuilder.equal(root.get("id"), id));
-            for(Map.Entry<String, Object> entry : notNullFields.entrySet()) {
-                criteriaUpdate.set(entry.getKey(), entry.getValue());
+            if(teacher != null) {
+                Optional<Teacher> optTeacher = teacherRepository.findById(teacher.getId());
+                course.setTeacher(optTeacher.get());
             }
-            updateRows = session.createQuery(criteriaUpdate).executeUpdate();
+
+            if(name != null) course.setName(name);
+            if(price != null) course.setPrice(price);
+            if(description != null) course.setDescription(description);
+            if(courseType != null) course.setType(courseType);
             transaction.commit();
+            isUpdate = true;
         } catch (Exception ex) {
-            ex.printStackTrace();
             transaction.rollback();
+            ex.printStackTrace();
         }
-        return updateRows > 0;
+        return isUpdate;
     }
 
     @Override
@@ -74,12 +81,10 @@ public class CourseRepositoryImpl implements CourseRepository {
         Transaction transaction = session.beginTransaction();
         Course course = null;
         try {
-            CriteriaQuery<Course> criteriaQuery = criteriaBuilder.createQuery(Course.class);
-            Root<Course> root = criteriaQuery.from(Course.class);
-            criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("id"), id));
-            course = session.createQuery(criteriaQuery).getSingleResult();
+            course = session.get(Course.class, id);
             transaction.commit();
         } catch (Exception ex) {
+            ex.printStackTrace();
             transaction.rollback();
         }
         return Optional.ofNullable(course);
@@ -105,17 +110,17 @@ public class CourseRepositoryImpl implements CourseRepository {
     @Override
     public boolean deleteById(Long id) {
         Transaction transaction = session.beginTransaction();
-        int deleteRows = 0;
+        boolean isDeleted = false;
         try {
-            CriteriaDelete<Course> criteriaDelete = criteriaBuilder.createCriteriaDelete(Course.class);
-            Root<Course> root = criteriaDelete.from(Course.class);
-            criteriaDelete.where(criteriaBuilder.equal(root.get("id"), id));
-            deleteRows = session.createQuery(criteriaDelete).executeUpdate();
+            Course course = session.get(Course.class, id);
+            if(course == null) return false;
+            session.delete(course);
             transaction.commit();
+            isDeleted = true;
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
         }
-        return deleteRows > 0;
+        return isDeleted;
     }
 }

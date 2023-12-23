@@ -1,7 +1,7 @@
 package org.example.facade.impl;
 
 import org.example.dto.StudentDTO;
-import org.example.facade.StudentFacade;
+import org.example.facade.StudentServiceAdapterToMapper;
 import org.example.mappers.StudentMapper;
 import org.example.model.Student;
 import org.example.services.StudentService;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class StudentFacadeImpl implements StudentFacade {
+public class StudentServiceAdapterToMapperImpl implements StudentServiceAdapterToMapper {
 
     private final StudentMapper mapper;
     private final StudentService service;
 
-    public StudentFacadeImpl(StudentMapper mapper, StudentService service) {
+    public StudentServiceAdapterToMapperImpl(StudentMapper mapper, StudentService service) {
         this.mapper = mapper;
         this.service = service;
     }

@@ -2,7 +2,7 @@ package org.example.facade.impl;
 
 import org.example.dto.subscription_dto.SubscriptionIncomingDTO;
 import org.example.dto.subscription_dto.SubscriptionOutGoingDTO;
-import org.example.facade.SubscriptionFacade;
+import org.example.facade.SubscriptionServiceAdapterToMapper;
 import org.example.mappers.SubscriptionKeyMapper;
 import org.example.mappers.SubscriptionMapper;
 import org.example.model.Subscription;
@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class SubscriptionFacadeImpl implements SubscriptionFacade {
+public class SubscriptionServiceAdapterToMapperImpl implements SubscriptionServiceAdapterToMapper {
 
     private final SubscriptionService service;
     private final SubscriptionMapper subscriptionMapper;
     private final SubscriptionKeyMapper subscriptionKeyMapper;
 
-    public SubscriptionFacadeImpl(SubscriptionService service, SubscriptionMapper mapper, SubscriptionKeyMapper subscriptionKeyMapper) {
+    public SubscriptionServiceAdapterToMapperImpl(SubscriptionService service, SubscriptionMapper mapper, SubscriptionKeyMapper subscriptionKeyMapper) {
         this.service = service;
         this.subscriptionMapper = mapper;
         this.subscriptionKeyMapper = subscriptionKeyMapper;

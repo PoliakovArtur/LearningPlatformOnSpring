@@ -16,7 +16,7 @@ import java.util.Optional;
 import static entity_factory.EntitiesForTests.EMPTY_COURSE;
 import static entity_factory.EntitiesForTests.COURSE;
 import static entity_factory.EntitiesForTests.ID;
-import static entity_factory.EntitiesForTests.NOT_FULL_COURSE;
+import static entity_factory.EntitiesForTests.COURSE_WITH_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -34,7 +34,7 @@ class CourseServiceImplTest {
     void setUp() {
         repository = mock(CourseRepository.class);
         teacherService = mock(TeacherService.class);
-        courseServiceImpl = new CourseServiceImpl(repository, teacherService);
+        courseServiceImpl = new CourseServiceImpl(repository);
         course.setTeacher(COURSE.getTeacher());
         course.setDescription(COURSE.getDescription());
         course.setId(COURSE.getId());
@@ -45,6 +45,7 @@ class CourseServiceImplTest {
 
     @Test
     void save_shouldSaveCourse() {
+        when(repository.save(course)).thenReturn(true);
         courseServiceImpl.save(course);
         verify(repository).save(course);
     }
@@ -52,7 +53,7 @@ class CourseServiceImplTest {
     @Test
     void save_shouldThrowBadRequestException() {
         assertThrows(BadRequestException.class,() -> courseServiceImpl.save(EMPTY_COURSE));
-        assertThrows(BadRequestException.class,() -> courseServiceImpl.save(NOT_FULL_COURSE));
+        assertThrows(BadRequestException.class,() -> courseServiceImpl.save(COURSE_WITH_NAME));
     }
 
     @Test

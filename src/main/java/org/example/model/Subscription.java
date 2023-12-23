@@ -1,7 +1,6 @@
 package org.example.model;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -16,6 +15,7 @@ import java.util.Objects;
 public class Subscription {
 
     @Column(name = "subscription_date")
+    @CreationTimestamp
     private LocalDateTime subscriptionDate;
 
     @EmbeddedId

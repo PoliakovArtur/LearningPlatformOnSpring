@@ -5,7 +5,7 @@ import org.example.dto.course_dto.CourseOutgoingDTO;
 
 import java.util.List;
 
-public interface CourseFacade {
+public interface CourseServiceAdapterToMapper {
 
     void save(CourseIncomingDTO incomingDTO);
 

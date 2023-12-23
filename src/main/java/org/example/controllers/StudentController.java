@@ -2,7 +2,7 @@ package org.example.controllers;
 
 import org.example.dto.MessageDTO;
 import org.example.dto.StudentDTO;
-import org.example.facade.StudentFacade;
+import org.example.facade.StudentServiceAdapterToMapper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,37 +18,37 @@ import java.util.List;
 @RequestMapping("/students")
 public class StudentController {
 
-    private StudentFacade facade;
+    private StudentServiceAdapterToMapper adapter;
 
-    public StudentController(StudentFacade facade) {
-        this.facade = facade;
+    public StudentController(StudentServiceAdapterToMapper adapter) {
+        this.adapter = adapter;
     }
 
     @GetMapping()
     public List<StudentDTO> findAll() {
-        return facade.findAll();
+        return adapter.findAll();
     }
 
     @GetMapping("/{id}")
     public StudentDTO findById(@PathVariable("id") long id) {
-        return facade.findById(id);
+        return adapter.findById(id);
     }
 
     @PostMapping
     public MessageDTO save(@RequestBody StudentDTO StudentDTO) {
-        facade.save(StudentDTO);
+        adapter.save(StudentDTO);
         return new MessageDTO("Студент сохранен");
     }
 
     @PutMapping("/{id}")
     public MessageDTO updateById(@PathVariable("id") long id, @RequestBody StudentDTO StudentDTO) {
-        facade.update(id, StudentDTO);
+        adapter.update(id, StudentDTO);
         return new MessageDTO(String.format("Данные о студенте c id {%d} обновлены", id));
     }
 
     @DeleteMapping("/{id}")
     public MessageDTO deleteById(@PathVariable("id") long id) {
-        facade.deleteById(id);
+        adapter.deleteById(id);
         return new MessageDTO(String.format("Студент с id {%d} успешно удален", id));
     }
 }

@@ -3,9 +3,14 @@ package controllers;
 import org.example.controllers.GlobalExceptionHandler;
 import org.example.controllers.SubscriptionController;
 import org.example.dto.MessageDTO;
+import org.example.dto.StudentDTO;
+import org.example.dto.subscription_dto.CourseForSubscriptionDTO;
+import org.example.dto.subscription_dto.SubscriptionIncomingDTO;
+import org.example.dto.subscription_dto.SubscriptionOutGoingDTO;
 import org.example.exceptions.BadRequestException;
 import org.example.exceptions.NotFoundException;
-import org.example.facade.SubscriptionFacade;
+import org.example.facade.SubscriptionServiceAdapterToMapper;
+import org.example.model.CourseType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -15,9 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static controllers.JsonStringConverter.asJsonString;
-import static entity_factory.EntitiesDtoForTests.INVALID_SUBSCRIPTION_INCOMING_DTO;
-import static entity_factory.EntitiesDtoForTests.SUBSCRIPTION_INCOMING_DTO;
-import static entity_factory.EntitiesDtoForTests.SUBSCRIPTION_OUT_GOING_DTO;
+import static entity_factory.EntitiesForTests.FIXED_DATE;
 import static entity_factory.EntitiesForTests.ID;
 import static entity_factory.EntitiesForTests.VALID_SUBSCRIPTION_ID;
 import static org.mockito.Mockito.doThrow;
@@ -39,11 +42,17 @@ public class SubscriptionControllerTest {
 
     MockMvc mockMvc;
 
-    private SubscriptionFacade facade;
+    private SubscriptionServiceAdapterToMapper facade;
+
+    private SubscriptionIncomingDTO incomingDTO = new SubscriptionIncomingDTO(ID, ID);
+    private StudentDTO studentDTO = new StudentDTO(ID, "Петров Александр", 30, FIXED_DATE);
+    private CourseForSubscriptionDTO courseDto = new CourseForSubscriptionDTO(ID, "Веб-Разработчик",
+            CourseType.PROGRAMMING,100000L);
+    private SubscriptionOutGoingDTO outGoingDTO = new SubscriptionOutGoingDTO(FIXED_DATE, studentDTO, courseDto);
 
     @BeforeEach
     void setUp() {
-        facade = mock(SubscriptionFacade.class);
+        facade = mock(SubscriptionServiceAdapterToMapper.class);
         controller = new SubscriptionController(facade);
         globalExceptionHandler = new GlobalExceptionHandler();
         mockMvc = MockMvcBuilders.standaloneSetup(controller, globalExceptionHandler).build();
@@ -51,12 +60,12 @@ public class SubscriptionControllerTest {
 
     @Test
     void getAll_shouldReturn200() throws Exception {
-        when(facade.findAll()).thenReturn(List.of(SUBSCRIPTION_OUT_GOING_DTO));
+        when(facade.findAll()).thenReturn(List.of(outGoingDTO));
         mockMvc.perform(get("/subscriptions/all"))
                 .andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(List.of(SUBSCRIPTION_OUT_GOING_DTO)))
+                        content().json(asJsonString(List.of(outGoingDTO)))
                 );
     }
 
@@ -84,23 +93,23 @@ public class SubscriptionControllerTest {
 
     @Test
     void getById_shouldReturn200() throws Exception {
-        when(facade.findById(INVALID_SUBSCRIPTION_INCOMING_DTO)).thenReturn(SUBSCRIPTION_OUT_GOING_DTO);
+        when(facade.findById(incomingDTO)).thenReturn(outGoingDTO);
         mockMvc.perform(get("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(INVALID_SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
-                        content().json(asJsonString(SUBSCRIPTION_OUT_GOING_DTO))
+                        content().json(asJsonString(outGoingDTO))
                 );
     }
 
     @Test
     void getById_shouldReturn404() throws Exception {
         String message = String.format("Подписка c id {%s} не найдена", VALID_SUBSCRIPTION_ID);
-        when(facade.findById(INVALID_SUBSCRIPTION_INCOMING_DTO)).thenThrow(new NotFoundException(message));
+        when(facade.findById(incomingDTO)).thenThrow(new NotFoundException(message));
         mockMvc.perform(get("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(INVALID_SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -110,10 +119,10 @@ public class SubscriptionControllerTest {
     @Test
     void deleteById_shouldReturn404() throws Exception {
         String message = String.format("Подписка с id {%s} не найдена", VALID_SUBSCRIPTION_ID);
-        doThrow(new NotFoundException(message)).when(facade).deleteById(INVALID_SUBSCRIPTION_INCOMING_DTO);
+        doThrow(new NotFoundException(message)).when(facade).deleteById(incomingDTO);
         mockMvc.perform(delete("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(INVALID_SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -125,7 +134,7 @@ public class SubscriptionControllerTest {
         String message = "Подписка удалена";
         mockMvc.perform(delete("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -137,21 +146,21 @@ public class SubscriptionControllerTest {
         String message = "Подписка добавлена";
         mockMvc.perform(post("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).save(SUBSCRIPTION_INCOMING_DTO);
+        verify(facade).save(incomingDTO);
     }
 
     @Test
     void save_shouldReturn400() throws Exception {
         String message = "Неверно передан id";
-        doThrow(new BadRequestException(message)).when(facade).save(INVALID_SUBSCRIPTION_INCOMING_DTO);
+        doThrow(new BadRequestException(message)).when(facade).save(incomingDTO);
         mockMvc.perform(post("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(INVALID_SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isBadRequest(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -161,10 +170,10 @@ public class SubscriptionControllerTest {
     @Test
     void save_tryToSaveExistsSubscription() throws Exception {
         String message = "Такая подписка уже есть";
-        doThrow(new BadRequestException(message)).when(facade).save(SUBSCRIPTION_INCOMING_DTO);
+        doThrow(new BadRequestException(message)).when(facade).save(incomingDTO);
         mockMvc.perform(post("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isBadRequest(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -174,10 +183,10 @@ public class SubscriptionControllerTest {
     @Test
     void save_shouldReturn404() throws Exception {
         String message = String.format("Студент с id %s не найден", ID);
-        doThrow(new NotFoundException(message)).when(facade).save(SUBSCRIPTION_INCOMING_DTO);
+        doThrow(new NotFoundException(message)).when(facade).save(incomingDTO);
         mockMvc.perform(post("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))
@@ -189,21 +198,21 @@ public class SubscriptionControllerTest {
         String message = "Подписка обновлена";
         mockMvc.perform(put("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isOk(),
                         content().json(asJsonString(new MessageDTO(message)))
                 );
-        verify(facade).update(SUBSCRIPTION_INCOMING_DTO);
+        verify(facade).update(incomingDTO);
     }
 
     @Test
     void update_shouldReturn404() throws Exception {
         String message = String.format("Подписка с id {%s} не найдена", VALID_SUBSCRIPTION_ID);
-        doThrow(new NotFoundException(message)).when(facade).update(SUBSCRIPTION_INCOMING_DTO);
+        doThrow(new NotFoundException(message)).when(facade).update(incomingDTO);
         mockMvc.perform(put("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(SUBSCRIPTION_INCOMING_DTO)))
+                        .content(asJsonString(incomingDTO)))
                 .andExpectAll(
                         status().isNotFound(),
                         content().json(asJsonString(new MessageDTO(message)))

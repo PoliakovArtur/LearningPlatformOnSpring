@@ -34,6 +34,10 @@ public class Teacher {
         this.age = age;
     }
 
+    public Teacher(Long id) {
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }

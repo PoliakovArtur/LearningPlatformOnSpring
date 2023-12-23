@@ -14,11 +14,9 @@ import java.util.List;
 @Service
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
-    private final TeacherService teacherService;
 
-    public CourseServiceImpl(CourseRepository courseRepository, TeacherService teacherService) {
+    public CourseServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
-        this.teacherService = teacherService;
     }
 
     @Override
@@ -29,10 +27,9 @@ public class CourseServiceImpl implements CourseService {
                 || course.getPrice() == null
                 || course.getTeacher() == null)
             throw new BadRequestException("Недостаточно данных для создания сущности");
-        Long teacherId = course.getTeacher().getId();
-        Teacher teacher = teacherService.findById(teacherId);
-        course.setTeacher(teacher);
-        courseRepository.save(course);
+        boolean isSaved = courseRepository.save(course);
+        if(!isSaved)
+            throw new NotFoundException(String.format("Учитель c id {%s} не найден", course.getTeacher().getId()));
     }
 
     @Override
@@ -43,13 +40,9 @@ public class CourseServiceImpl implements CourseService {
                 && course.getPrice() == null
                 && course.getTeacher() == null)
             throw new BadRequestException("Должно быть установлено хотя бы одно поле для обновления сущности");
-        if(course.getTeacher() != null) {
-            Long teacherId = course.getTeacher().getId();
-            teacherService.findById(teacherId);
-        }
         boolean isUpdated = courseRepository.update(course);
         if(!isUpdated)
-            throw new NotFoundException(String.format("Курс c id {%s} не найден", course.getId()));
+            throw new NotFoundException(String.format("Курс c id {%s} не найден либо teacher id установлен неверно ", course.getId()));
     }
 
     @Override

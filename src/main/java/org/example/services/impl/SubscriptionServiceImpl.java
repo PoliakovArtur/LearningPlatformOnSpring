@@ -71,6 +71,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 subscriptions.add(subscription);
             } catch (Exception ex) {
                 System.err.printf("DB is not consistency! Subscription %s is invalid\n", subscription);
+                ex.printStackTrace();
             }
         }
         if(subscriptions.isEmpty()) throw new NotFoundException("На данный момент нет ни одной подписки");
