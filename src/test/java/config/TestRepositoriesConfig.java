@@ -105,7 +105,6 @@ public class TestRepositoriesConfig {
 
     @PreDestroy
     public void closeResources() throws IOException {
-        System.out.println("call pre destroy");
         mySQLContainer.stop();
         sessions.forEach(Session::close);
         sessionFactory.close();
