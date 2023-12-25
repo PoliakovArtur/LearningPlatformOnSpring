@@ -1,7 +1,8 @@
 package org.example.model;
 
 
-import javax.persistence.Column;
+import jakarta.persistence.Column;
+
 import java.io.Serializable;
 import java.util.Objects;
 

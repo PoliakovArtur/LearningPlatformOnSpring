@@ -6,9 +6,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,11 +14,9 @@ import java.util.Optional;
 public class StudentRepositoryImpl implements StudentRepository {
 
     private final Session session;
-    private final CriteriaBuilder criteriaBuilder;
 
     public StudentRepositoryImpl(Session session) {
         this.session = session;
-        this.criteriaBuilder = session.getCriteriaBuilder();
     }
 
     @Override
@@ -76,10 +71,7 @@ public class StudentRepositoryImpl implements StudentRepository {
         Transaction transaction = session.beginTransaction();
         List<Student> students = Collections.emptyList();
         try {
-            CriteriaQuery<Student> criteriaQuery = criteriaBuilder.createQuery(Student.class);
-            Root<Student> root = criteriaQuery.from(Student.class);
-            criteriaQuery.select(root);
-            students = session.createQuery(criteriaQuery).getResultList();
+            students = session.createQuery("FROM Student", Student.class).getResultList();
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -95,7 +87,7 @@ public class StudentRepositoryImpl implements StudentRepository {
         try {
             Student student = session.get(Student.class, id);
             if(student == null) return false;
-            session.delete(student);
+            session.remove(student);
             transaction.commit();
             isDeleted = true;
         } catch (Exception ex) {

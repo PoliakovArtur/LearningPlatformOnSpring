@@ -5,10 +5,6 @@ import org.example.repositories.TeacherRepository;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,11 +13,9 @@ import java.util.Optional;
 public class TeacherRepositoryImpl implements TeacherRepository {
 
     private final Session session;
-    private final CriteriaBuilder criteriaBuilder;
 
     public TeacherRepositoryImpl(Session session) {
         this.session = session;
-        this.criteriaBuilder = session.getCriteriaBuilder();
     }
 
     @Override
@@ -33,7 +27,6 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         } catch (Exception ex) {
             ex.printStackTrace();
             transaction.rollback();
-            throw new InternalError();
         }
     }
 
@@ -69,6 +62,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
             teacher = session.get(Teacher.class, id);
             transaction.commit();
         } catch (Exception ex) {
+            ex.printStackTrace();
             transaction.rollback();
         }
         return Optional.ofNullable(teacher);
@@ -79,10 +73,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         Transaction transaction = session.beginTransaction();
         List<Teacher> teachers = Collections.emptyList();
         try {
-            CriteriaQuery<Teacher> criteriaQuery = criteriaBuilder.createQuery(Teacher.class);
-            Root<Teacher> root = criteriaQuery.from(Teacher.class);
-            criteriaQuery.select(root);
-            teachers = session.createQuery(criteriaQuery).getResultList();
+            teachers = session.createQuery("FROM Teacher", Teacher.class).getResultList();
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -98,7 +89,7 @@ public class TeacherRepositoryImpl implements TeacherRepository {
         try {
             Teacher teacher = session.get(Teacher.class, id);
             if(teacher == null) return false;
-            session.delete(teacher);
+            session.remove(teacher);
             transaction.commit();
             isDeleted = true;
         } catch (Exception ex) {

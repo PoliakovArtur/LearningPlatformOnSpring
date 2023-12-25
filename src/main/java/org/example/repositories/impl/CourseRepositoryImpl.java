@@ -9,9 +9,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +17,11 @@ import java.util.Optional;
 public class CourseRepositoryImpl implements CourseRepository {
 
     private final Session session;
-    private final CriteriaBuilder criteriaBuilder;
     private final TeacherRepository teacherRepository;
 
     public CourseRepositoryImpl(Session session, TeacherRepository teacherRepository) {
         this.teacherRepository = teacherRepository;
         this.session = session;
-        this.criteriaBuilder = session.getCriteriaBuilder();
     }
 
     @Override
@@ -95,10 +90,7 @@ public class CourseRepositoryImpl implements CourseRepository {
         Transaction transaction = session.beginTransaction();
         List<Course> courses = Collections.emptyList();
         try {
-            CriteriaQuery<Course> criteriaQuery = criteriaBuilder.createQuery(Course.class);
-            Root<Course> root = criteriaQuery.from(Course.class);
-            criteriaQuery.select(root);
-            courses = session.createQuery(criteriaQuery).getResultList();
+            courses = session.createQuery("FROM Course", Course.class).getResultList();
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -114,7 +106,7 @@ public class CourseRepositoryImpl implements CourseRepository {
         try {
             Course course = session.get(Course.class, id);
             if(course == null) return false;
-            session.delete(course);
+            session.remove(course);
             transaction.commit();
             isDeleted = true;
         } catch (Exception ex) {

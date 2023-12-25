@@ -7,9 +7,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -19,11 +16,9 @@ import java.util.Optional;
 public class SubscriptionRepositoryImpl implements SubscriptionRepository {
 
     private final Session session;
-    private final CriteriaBuilder criteriaBuilder;
 
     public SubscriptionRepositoryImpl(Session session) {
         this.session = session;
-        this.criteriaBuilder = session.getCriteriaBuilder();
     }
 
     @Override
@@ -72,10 +67,7 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         Transaction transaction = session.beginTransaction();
         List<Subscription> subscriptions = Collections.emptyList();
         try {
-            CriteriaQuery<Subscription> criteriaQuery = criteriaBuilder.createQuery(Subscription.class);
-            Root<Subscription> root = criteriaQuery.from(Subscription.class);
-            criteriaQuery.select(root);
-            subscriptions = session.createQuery(criteriaQuery).getResultList();
+            subscriptions = session.createQuery("FROM Subscription", Subscription.class).getResultList();
             transaction.commit();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -91,7 +83,7 @@ public class SubscriptionRepositoryImpl implements SubscriptionRepository {
         try {
             Subscription subscription = session.get(Subscription.class, id);
             if(subscription == null) return false;
-            session.delete(subscription);
+            session.remove(subscription);
             transaction.commit();
             isDeleted = true;
         } catch (Exception ex) {
